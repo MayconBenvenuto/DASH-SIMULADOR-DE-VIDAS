@@ -2,14 +2,18 @@ import { useQuery, useAction } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Toaster } from "sonner";
 import { useState } from "react";
+import { DashboardBarChart } from "./components/DashboardBarChart";
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm h-16 flex justify-center items-center border-b shadow-sm px-4">
-        <h2 className="text-xl font-semibold text-primary">Dashboard Google Sheets</h2>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-100 via-cyan-50 to-white">
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md h-20 flex justify-center items-center border-b shadow-md px-4">
+        <h2 className="text-2xl font-extrabold text-primary tracking-tight drop-shadow-sm flex items-center gap-2">
+          <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12l2 2 4-4" /></svg>
+          Dashboard Vida+Saúde
+        </h2>
       </header>
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 max-w-7xl mx-auto w-full">
         <Dashboard />
       </main>
       <Toaster />
@@ -56,14 +60,59 @@ function Dashboard() {
     return new Date(timestamp).toLocaleString('pt-BR');
   };
 
+  // Observações dinâmicas
+  const obsSimulador = [];
+  const vidasSim = dashboardData.simulador?.vidasTotaisVendidas ?? 0;
+  const mediaSim = dashboardData.simulador?.mediaMes ?? 0;
+  if (vidasSim > 100) {
+    obsSimulador.push("Ótimo desempenho em vidas vendidas no Simulador!");
+  } else if (vidasSim > 0) {
+    obsSimulador.push("Há potencial para aumentar as vendas no Simulador.");
+  } else {
+    obsSimulador.push("Nenhuma venda registrada no Simulador.");
+  }
+  if (mediaSim > 1000) {
+    obsSimulador.push("A média mensal está acima de R$ 1.000, excelente!");
+  }
+
+  const obsIndicacao = [];
+  const vidasInd = dashboardData.indicacao?.vidasTotaisVendidas ?? 0;
+  const mediaInd = dashboardData.indicacao?.mediaMes ?? 0;
+  if (vidasInd > 100) {
+    obsIndicacao.push("Ótimo desempenho em vidas vendidas por Indicação!");
+  } else if (vidasInd > 0) {
+    obsIndicacao.push("Há potencial para aumentar as vendas por Indicação.");
+  } else {
+    obsIndicacao.push("Nenhuma venda registrada por Indicação.");
+  }
+  if (mediaInd > 1000) {
+    obsIndicacao.push("A média mensal está acima de R$ 1.000, excelente!");
+  }
+
+  // Dados para o gráfico
+  const chartData = [
+    {
+      name: "Simulador",
+      vidas: dashboardData.simulador?.vidasTotaisVendidas || 0,
+      valor: dashboardData.simulador?.valorRecebido || 0,
+      media: dashboardData.simulador?.mediaMes || 0,
+    },
+    {
+      name: "Indicação",
+      vidas: dashboardData.indicacao?.vidasTotaisVendidas || 0,
+      valor: dashboardData.indicacao?.valorRecebido || 0,
+      media: dashboardData.indicacao?.mediaMes || 0,
+    },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard de Vendas</h1>
+    <div className="max-w-7xl mx-auto space-y-10">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <h1 className="text-4xl font-extrabold text-gray-900 section-title">Relatório de Vendas</h1>
         <button
-          onClick={handleManualUpdate}
+          onClick={() => { void handleManualUpdate(); }}
           disabled={isUpdating}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-6 py-3 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
         >
           {isUpdating ? (
             <>
@@ -83,11 +132,11 @@ function Dashboard() {
 
       {/* SIMULADOR Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+        <h2 className="section-title">
+          <div className="w-4 h-4 bg-blue-500 rounded-full shadow"></div>
           SIMULADOR
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <MetricCard
             title="Vidas Totais Vendidas"
             value={dashboardData.simulador?.vidasTotaisVendidas || 0}
@@ -119,11 +168,11 @@ function Dashboard() {
 
       {/* INDICACAO Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+        <h2 className="section-title">
+          <div className="w-4 h-4 bg-orange-500 rounded-full shadow"></div>
           INDICAÇÃO
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <MetricCard
             title="Vidas Totais Vendidas"
             value={dashboardData.indicacao?.vidasTotaisVendidas || 0}
@@ -153,14 +202,31 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Status de atualização automática */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-sm text-blue-800">
-            Os dados são atualizados automaticamente a cada 5 minutos
-          </span>
+      {/* Gráfico de Barras Comparativo */}
+      <DashboardBarChart data={chartData} />
+
+      {/* Observações dinâmicas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <h4 className="font-bold text-primary mb-2 flex items-center gap-2"><span className="w-2 h-2 bg-blue-500 rounded-full"></span>Observações Simulador</h4>
+          <ul className="list-disc ml-5 text-gray-700">
+            {obsSimulador.map((obs, i) => <li key={i}>{obs}</li>)}
+          </ul>
         </div>
+        <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <h4 className="font-bold text-primary mb-2 flex items-center gap-2"><span className="w-2 h-2 bg-orange-500 rounded-full"></span>Observações Indicação</h4>
+          <ul className="list-disc ml-5 text-gray-700">
+            {obsIndicacao.map((obs, i) => <li key={i}>{obs}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      {/* Status de atualização automática */}
+      <div className="bg-gradient-to-r from-blue-100 via-blue-50 to-white border border-blue-200 rounded-2xl p-4 shadow flex items-center gap-3">
+        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+        <span className="text-sm text-blue-800 font-medium">
+          Os dados são atualizados automaticamente a cada 5 minutos
+        </span>
       </div>
     </div>
   );
@@ -176,14 +242,14 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, formatter, icon, color }: MetricCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="metric-card">
       <div className="flex items-center justify-between mb-4">
-        <div className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center text-white text-xl`}>
+        <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white text-2xl shadow-lg`}>
           {icon}
         </div>
       </div>
-      <h3 className="text-sm font-medium text-gray-600 mb-2">{title}</h3>
-      <p className="text-2xl font-bold text-gray-900">{formatter(value)}</p>
+      <h3 className="text-base font-semibold text-gray-600 mb-2 tracking-tight">{title}</h3>
+      <p className="text-3xl font-extrabold text-gray-900 drop-shadow-sm">{formatter(value)}</p>
     </div>
   );
 }

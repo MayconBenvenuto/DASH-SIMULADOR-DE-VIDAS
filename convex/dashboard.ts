@@ -77,38 +77,29 @@ export const fetchSheetData = internalAction({
       const csvText = await response.text();
       const lines = csvText.trim().split('\n');
       
-      // Parse CSV data
-      const data = lines.slice(1).map(line => {
-        const values = line.split(',').map(val => val.replace(/"/g, '').trim());
-        return values;
-      });
-
-      // Calcular métricas baseadas nos dados
+      // Procurar as linhas específicas por nome
       let vidasTotaisVendidas = 0;
       let valorRecebido = 0;
-      let somaValores = 0;
-      let contadorMeses = 0;
+      let mediaMes = 0;
 
-      // Processar dados para extrair métricas
-      data.forEach(row => {
-        // Assumindo que as colunas contêm dados numéricos relevantes
-        // Você pode ajustar estes índices baseado na estrutura real da sua planilha
-        if (row.length > 0) {
-          const valor1 = parseFloat(row[0]) || 0;
-          const valor2 = parseFloat(row[1]) || 0;
-          const valor3 = parseFloat(row[2]) || 0;
-          
-          vidasTotaisVendidas += valor1;
-          valorRecebido += valor2;
-          
-          if (valor3 > 0) {
-            somaValores += valor3;
-            contadorMeses++;
-          }
+      lines.forEach(line => {
+        const clean = line.replace(/"/g, '').replace(/\t/g, '').trim();
+        if (clean.toLowerCase().startsWith('vidas totais vendidas')) {
+          // Exemplo: Vidas Totais vendidas,,16,,,,,,
+          const match = clean.match(/vidas totais vendidas.*?(\d+)/i);
+          if (match) vidasTotaisVendidas = parseInt(match[1], 10);
+        }
+        if (clean.toLowerCase().startsWith('valor recebido')) {
+          // Exemplo: Valor Recebido,,R$ 414,96,,,,,,
+          const match = clean.match(/valor recebido.*?r\$\s*([\d.,]+)/i);
+          if (match) valorRecebido = parseFloat(match[1].replace('.', '').replace(',', '.'));
+        }
+        if (clean.toLowerCase().includes('média mês')) {
+          // Exemplo: Média Mês ( 8 meses ) ,,R$ 51,87,,,,,,
+          const match = clean.match(/m[eé]dia m[eê]s.*?r\$\s*([\d.,]+)/i);
+          if (match) mediaMes = parseFloat(match[1].replace('.', '').replace(',', '.'));
         }
       });
-
-      const mediaMes = contadorMeses > 0 ? somaValores / Math.min(contadorMeses, 8) : 0;
 
       // Salvar no banco de dados
       await ctx.runMutation(internal.dashboard.saveDashboardData, {
