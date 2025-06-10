@@ -9,7 +9,7 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-100 via-cyan-50 to-white">
       <header className="sticky top-0 z-10 bg-[#011147] h-20 flex justify-center items-center border-b shadow-md px-4">
         <div className="flex items-center gap-3 w-full max-w-5xl justify-center relative">
-          <img src="/assets/logo-belz.jpg" alt="Logo Belz" className="h-12 w-12 object-contain rounded bg-white p-1 absolute left-0" />
+          <img src={import.meta.env.BASE_URL + "assets/logo-belz.jpg"} alt="Logo Belz" className="h-12 w-12 object-contain rounded bg-white p-1 absolute left-0" />
           <h2 className="text-2xl font-extrabold text-white tracking-tight drop-shadow-sm flex items-center gap-2 mx-auto">
             Dashboard Vida+Saúde
           </h2>
