@@ -107,8 +107,14 @@ function Dashboard() {
     },
   ];
 
+  // Soma total do valor recebido (Simulador + Indicação)
+  const totalValorRecebido =
+    (dashboardData.simulador?.valorRecebido || 0) +
+    (dashboardData.indicacao?.valorRecebido || 0);
+
   return (
     <div className="max-w-7xl mx-auto space-y-10">
+
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <h1 className="text-4xl font-extrabold text-gray-900 section-title">Relatório de Vendas</h1>
         <button
@@ -202,6 +208,17 @@ function Dashboard() {
             Última atualização: {formatDate(dashboardData.indicacao.lastUpdated)}
           </p>
         )}
+
+        {/* Total Valor Recebido */}
+      <div className="mb-6">
+        <MetricCard
+          title="Total Valor Recebido"
+          value={totalValorRecebido}
+          formatter={formatCurrency}
+          icon="🧮"
+          color="bg-yellow-500"
+        />
+      </div>
       </div>
 
       {/* Gráfico de Barras Comparativo */}
