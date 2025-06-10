@@ -7,11 +7,14 @@ import { DashboardBarChart } from "./components/DashboardBarChart";
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-100 via-cyan-50 to-white">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md h-20 flex justify-center items-center border-b shadow-md px-4">
-        <h2 className="text-2xl font-extrabold text-primary tracking-tight drop-shadow-sm flex items-center gap-2">
-          <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12l2 2 4-4" /></svg>
-          Dashboard Vida+Saúde
-        </h2>
+      <header className="sticky top-0 z-10 bg-[#011147] h-20 flex justify-between items-center border-b shadow-md px-4">
+        <div className="flex items-center gap-3">
+          <img src="/assets/logo-belz.jpg" alt="Logo Belz" className="h-12 w-12 object-contain rounded bg-white p-1" />
+          <h2 className="text-2xl font-extrabold text-white tracking-tight drop-shadow-sm flex items-center gap-2">
+            Dashboard Vida+Saúde
+          </h2>
+        </div>
+        {/* Se quiser adicionar itens à direita do header, adicione aqui */}
       </header>
       <main className="flex-1 p-8 max-w-7xl mx-auto w-full">
         <Dashboard />
